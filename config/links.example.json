@@ -1,14 +1,14 @@
 {
   "links": [
     {
-      "label": "JNA Šotor",
-      "url": "https://www.bolha.com/search/?keywords=jna+%C5%A1otor",
-      "ignoreWords": [],
+      "label": "Avto-moto",
+      "url": "https://www.bolha.com/avto-moto",
+      "ignoreWords": ["poceni", "okvara"],
       "maxItems": 30
     },
     {
-      "label": "JNA M70",
-      "url": "https://www.bolha.com/search/?keywords=jna+m70&page=2",
+      "label": "Tomos mopeds",
+      "url": "https://www.bolha.com/mopedi",
       "ignoreWords": [],
       "maxItems": 30
     }
