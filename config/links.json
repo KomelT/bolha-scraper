@@ -1,0 +1,16 @@
+{
+  "links": [
+    {
+      "label": "JNA Šotor",
+      "url": "https://www.bolha.com/search/?keywords=jna+%C5%A1otor",
+      "ignoreWords": [],
+      "maxItems": 30
+    },
+    {
+      "label": "JNA M70",
+      "url": "https://www.bolha.com/search/?keywords=jna+m70&page=2",
+      "ignoreWords": [],
+      "maxItems": 30
+    }
+  ]
+}
