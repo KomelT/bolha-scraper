@@ -39,6 +39,15 @@ export async function scrapeLink(link: LinkConfig, opts: ScraperOptions): Promis
     throw new Error("bolha.si responded with a bot manager challenge (captcha).");
   }
 
+  const lowerHtml = html.toLowerCase();
+  const emptyMarkers = [
+    "trenutno ni rezultatov za iskanje",
+    "ostali oglasi, ki bi te lahko zanimali",
+  ];
+  if (emptyMarkers.some((marker) => lowerHtml.includes(marker))) {
+    return { link, listings: [] };
+  }
+
   const listings = parseListings(html, link.url);
   const filtered = filterListings(listings, link.ignoreWords || []);
 
