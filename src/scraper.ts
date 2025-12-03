@@ -48,7 +48,7 @@ export async function scrapeLink(link: LinkConfig, opts: ScraperOptions): Promis
     return { link, listings: [] };
   }
 
-  const listings = parseListings(html, link.url);
+  const listings = parseListings(extractRelevantSection(html), link.url);
   const filtered = filterListings(listings, link.ignoreWords || []);
 
   return { link, listings: filtered.slice(0, link.maxItems || 50) };
@@ -137,4 +137,13 @@ function filterListings(listings: Listing[], ignoreWords: string[]): Listing[] {
     const title = listing.title.toLowerCase();
     return !lowerWords.some((word) => word && title.includes(word));
   });
+}
+
+function extractRelevantSection(html: string): string {
+  const lower = html.toLowerCase();
+  const start = lower.indexOf("oglasi na bolha.com");
+  if (start === -1) return html;
+  const end = lower.indexOf("zadnji oglasi", start + 1);
+  if (end === -1) return html;
+  return html.slice(start, end);
 }
