@@ -43,6 +43,8 @@ export async function scrapeLink(link: LinkConfig, opts: ScraperOptions): Promis
   const emptyMarkers = [
     "trenutno ni rezultatov za iskanje",
     "ostali oglasi, ki bi te lahko zanimali",
+    "trenutno nema rezultata za pretragu",
+    "ostali oglasi koji bi te mogli zanimati",
   ];
   if (emptyMarkers.some((marker) => lowerHtml.includes(marker))) {
     return { link, listings: [] };
