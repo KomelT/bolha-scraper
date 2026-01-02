@@ -11,14 +11,17 @@ dotenv.config();
 async function main() {
   const config = loadConfig();
   const state = new StateStore(config.stateFile);
+  const requestDelayMs = 10000;
+
+  const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
   const run = async () => {
     console.log(`[${new Date().toISOString()}] Starting scrape cycle...`);
-    for (const link of config.links) {
+    for (let index = 0; index < config.links.length; index += 1) {
+      const link = config.links[index];
       try {
         const result = await scrapeLink(link, {
           requestTimeoutMs: config.requestTimeoutMs,
-          userAgent: config.userAgent,
         });
         const existingIds = state.get(link.url);
         const isInitialForLink = existingIds.length === 0;
@@ -45,6 +48,9 @@ async function main() {
         console.log(`Reported ${newListings.length} new items for ${link.label}`);
       } catch (err) {
         console.error(`Failed to scrape ${link.label}:`, err instanceof Error ? err.message : err);
+      }
+      if (index < config.links.length - 1) {
+        await sleep(requestDelayMs);
       }
     }
     console.log(`[${new Date().toISOString()}] Cycle finished.`);

@@ -8,7 +8,6 @@ export type AppConfig = {
   stateFile: string;
   cron: string;
   requestTimeoutMs: number;
-  userAgent: string;
 };
 
 const DEFAULTS = {
@@ -16,9 +15,6 @@ const DEFAULTS = {
   stateFile: process.env.STATE_FILE || path.resolve("data/state.json"),
   cron: process.env.SCRAPE_INTERVAL_CRON || "0 * * * *",
   requestTimeoutMs: Number(process.env.REQUEST_TIMEOUT_MS || 15000),
-  userAgent:
-    process.env.USER_AGENT ||
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
 };
 
 export function loadConfig(): AppConfig {
@@ -46,6 +42,5 @@ export function loadConfig(): AppConfig {
     stateFile: DEFAULTS.stateFile,
     cron: DEFAULTS.cron,
     requestTimeoutMs: DEFAULTS.requestTimeoutMs,
-    userAgent: DEFAULTS.userAgent,
   };
 }

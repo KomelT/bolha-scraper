@@ -1,11 +1,11 @@
 import axios from "axios";
+import { randomUUID } from "crypto";
 import { Cheerio, load } from "cheerio";
 import { AnyNode } from "domhandler";
 import { LinkConfig, Listing, ScrapeResult } from "./types";
 
 export type ScraperOptions = {
   requestTimeoutMs: number;
-  userAgent: string;
 };
 
 const ITEM_SELECTORS = [
@@ -22,9 +22,10 @@ const TITLE_SELECTORS = ["h2", "h3", ".title", ".EntityList-item-title"];
 const PRICE_SELECTORS = [".price", ".Price", ".adPrice", ".entity-pricetag", "[itemprop=price]"];
 
 export async function scrapeLink(link: LinkConfig, opts: ScraperOptions): Promise<ScrapeResult> {
+  const requestUserAgent = randomUUID();
   const response = await axios.get(link.url, {
     headers: {
-      "User-Agent": opts.userAgent,
+      "User-Agent": requestUserAgent,
       Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
       "Accept-Language": "en-US,en;q=0.9,sl;q=0.8",
       Referer: "https://www.google.com/",
