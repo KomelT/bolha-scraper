@@ -62,6 +62,20 @@ test("accepts an explicitly empty result page", () => {
   assert.deepEqual(result.listings, []);
 });
 
+test("never treats Bolha's latest-ads fallback as search results", () => {
+  const html = `
+    <section class="EntityList">
+      <h2 class="EntityList-groupTitle">Zadnji oglasi</h2>
+      <ul class="EntityList-items">
+        <li class="EntityList-item">
+          <article><h3><a href="/avto/nepovezan-oglas-99999999">Unrelated ad</a></h3></article>
+        </li>
+      </ul>
+    </section>`;
+
+  assert.deepEqual(parsePage(html, link).listings, []);
+});
+
 test("reports bot challenges instead of treating them as an empty search", () => {
   assert.throws(
     () => parsePage("<title>ShieldSquare Captcha</title>", link),

@@ -72,6 +72,9 @@ export function parsePage(html: string, link: LinkConfig): ScrapeResult {
   const listings = parseListings(html, link.url);
   const filtered = filterListings(listings, link.ignoreWords || []);
 
+  if (listings.length === 0 && isBolhaSearchWithOnlyLatestAds(html, link.url)) {
+    return { link, listings: [] };
+  }
   if (listings.length === 0) {
     throw new Error(
       `${hostname(link.url)} returned no recognizable listings; its page markup may have changed.`
@@ -84,6 +87,7 @@ export function parsePage(html: string, link: LinkConfig): ScrapeResult {
 export function parseListings(html: string, sourceLink: string): Listing[] {
   const $ = load(html);
   const scope = findListingScope($);
+  if (!scope) return [];
   let nodes: Cheerio<AnyNode> | null = null;
   for (const selector of ITEM_SELECTORS) {
     const found = scope.find(selector);
@@ -167,13 +171,19 @@ function filterListings(listings: Listing[], ignoreWords: string[]): Listing[] {
   });
 }
 
-function findListingScope($: ReturnType<typeof load>): Cheerio<AnyNode> {
+function findListingScope($: ReturnType<typeof load>): Cheerio<AnyNode> | undefined {
   const titledGroups = $(".EntityList-groupTitle").filter((_, element) => {
     const title = cleanText($(element).text()).toLocaleLowerCase();
     return title.includes("oglasi na bolha") || title.includes("njuškalo oglasi");
   });
   const group = titledGroups.first().parent();
-  return group.length > 0 ? group : $.root();
+  if (group.length > 0) return group;
+
+  // Bolha renders a separate "Zadnji oglasi" list when a search has no matching ads.
+  // It must never become a fallback source for the configured search.
+  if ($(".EntityList-groupTitle").length > 0) return undefined;
+
+  return $.root();
 }
 
 function findListingAnchor(root: Cheerio<AnyNode>): Cheerio<AnyNode> {
@@ -191,6 +201,23 @@ function isExplicitlyEmpty(html: string): boolean {
     EMPTY_MARKERS.some((marker) => lowerHtml.includes(marker)) ||
     /\b0\s+(?:oglasov|oglasa)\b/i.test(lowerHtml)
   );
+}
+
+function isBolhaSearchWithOnlyLatestAds(html: string, sourceLink: string): boolean {
+  try {
+    const source = new URL(sourceLink);
+    if (!source.hostname.endsWith("bolha.com") || !source.pathname.startsWith("/search")) {
+      return false;
+    }
+  } catch {
+    return false;
+  }
+
+  const $ = load(html);
+  const titles = $(".EntityList-groupTitle")
+    .map((_, element) => cleanText($(element).text()).toLocaleLowerCase())
+    .get();
+  return titles.length > 0 && titles.every((title) => title.includes("zadnji oglasi"));
 }
 
 function cleanText(value: string): string {
